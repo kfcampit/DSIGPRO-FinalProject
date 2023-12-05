@@ -1,0 +1,210 @@
+function noPlate = getLicensePlate(im)
+
+    for i = 0:35
+        % Load Image
+        filename = strcat(strcat('phfont/',int2str(i)),'.jpg');
+        curr_char = imread(filename);
+        curr_char = imresize(curr_char, [42 24]);   
+    
+        % Convert to Grayscale
+        curr_char_gray = rgb2gray(curr_char);
+    
+        % Convert to Binary 
+        curr_char_bin = imbinarize(curr_char_gray);
+        
+        % Reverse 1 and 0
+        curr_char_bin = bwareaopen(~curr_char_bin,64);
+        [curr_char_h, curr_char_w] = size(curr_char_bin);
+    
+        % Remove outside background
+        Iprops = regionprops(curr_char_bin,'BoundingBox','Area', 'Image');
+        
+        curr_char_bin = imcrop(curr_char_bin, Iprops.BoundingBox);
+        curr_char_bin = imresize(curr_char_bin, [42 24]);
+        
+        %figure(i+10);imshow(curr_char_bin);
+    
+        if(i<10)
+            number{i+1} = curr_char_bin;
+        else
+            letter{i-9} = curr_char_bin;
+        end
+    end
+    
+    alphanum = [letter number];
+    
+    %% Load Image    
+    figure(1);subplot(3,2,1);imshow(im);
+    title("Original RGB Image")
+    
+    %% Extract Rectangular License Plate
+    % Convert to Grayscale
+    imgray = rgb2gray(im);
+    figure(1);subplot(3,2,2);imshow(imgray);
+    title("Grayscale Image")
+    
+    % Apply Gaussian Blur
+    imgauss = imgaussfilt(imgray,0.1);
+    
+    % Convert to Binary 
+    imbin = imbinarize(imgauss, 0.5);
+    figure(1);subplot(3,2,3);imshow(imbin);
+    title("Binary Image")
+    
+    Iprops=regionprops(imbin,'BoundingBox','Area', 'Image');
+    maxa = Iprops.Area;
+    count = numel(Iprops);
+    boundingBox = Iprops.BoundingBox;
+    
+    % Find which objects detected is a license plate based 
+    % on the sizes of the objects
+    for i=1:count 
+       if (maxa < Iprops(i).Area && ...
+               ((Iprops(i).BoundingBox(3) > ...
+               2*Iprops(i).BoundingBox(4)) && ...
+               (Iprops(i).BoundingBox(3) < ...
+               3.5*Iprops(i).BoundingBox(4))))
+            maxa=Iprops(i).Area;
+            boundingBox=Iprops(i).BoundingBox;
+       end
+    end   
+    
+    im = imcrop(imbin, boundingBox);
+    figure(1);subplot(3,2,4);imshow(im);
+    title("Extracted License Plate");
+    
+    %% Character Extraction
+    % Remove parts of the image that has less than 64 pixels connected with
+    % each other
+    im = bwareaopen(~im, 64);
+    [h, w] = size(im);
+    
+    figure(1);subplot(3,2,5);imshow(im);
+    title("Inverted License Plate");
+    
+    im = imerode(im,strel("square",2));
+    figure(1);subplot(3,2,6);imshow(im);
+    title("Eroded License Plate");
+    
+    im = imresize(im, [200 540]);
+    
+    % Start to extract each character
+    Iprops = regionprops(im,'BoundingBox','Area', 'Image');
+    
+    
+    count = 1;
+    for i=1:numel(Iprops)
+        if (Iprops(i).Area>900) && (Iprops(i).Area<3500) && (count<=7)
+            iprops_boundingbox(count).Area = Iprops(i).Area;
+            iprops_boundingbox(count).BoundingBox = Iprops(i).BoundingBox;
+            iprops_boundingbox(count).Image = Iprops(i).Image;
+            count = count+1;
+        end
+    end
+    
+    noPlate=[];
+    
+    figure(2);
+    for i=1:numel(iprops_boundingbox)
+        let = imcrop(im, iprops_boundingbox(i).BoundingBox);
+        let = imresize(let, [42 24]);
+    
+        subplot(2,7,i);imshow(let);
+        
+        rec = [ ];
+    
+        if i<=3
+            for n=1:length(alphanum(1:26))
+                cor = corr2(alphanum{n}, let);
+                rec = [rec cor];
+            end
+            ind = find(rec == max(rec));
+        else
+            for n=27:36
+                cor = corr2(alphanum{n}, let);
+                rec = [rec cor];
+            end
+            ind = find([zeros(1,26) rec] == max([zeros(1,26) rec]));
+        end
+    
+        subplot(2,7,7+i);imshow(alphanum{ind});
+        
+        if ind==1
+            letter='A';
+        elseif ind==2
+            letter='B';
+        elseif ind==3
+            letter='C';
+        elseif ind==4
+            letter='D';
+        elseif ind==5
+            letter='E';
+        elseif ind==6
+            letter='F';
+        elseif ind==7
+            letter='G';
+        elseif ind==8
+            letter='H';
+        elseif ind==9
+            letter='I';
+        elseif ind==10
+            letter='J';
+        elseif ind==11
+            letter='K';
+        elseif ind==12
+            letter='L';
+        elseif ind==13
+            letter='M';
+        elseif ind==14
+            letter='N';
+        elseif ind==15
+            letter='O';
+        elseif ind==16
+            letter='P';
+        elseif ind==17
+            letter='Q';
+        elseif ind==18
+            letter='R';
+        elseif ind==19
+            letter='S';
+        elseif ind==20
+            letter='T';
+        elseif ind==21
+            letter='U';
+        elseif ind==22
+            letter='V';
+        elseif ind==23
+            letter='W';
+        elseif ind==24
+            letter='X';
+        elseif ind==25
+            letter='Y';
+        elseif ind==26
+            letter='Z';
+        elseif ind==27
+            letter='1';
+        elseif ind==28
+            letter='2';
+        elseif ind==29
+            letter='3';
+        elseif ind==30
+            letter='4';
+        elseif ind==31
+            letter='5';
+        elseif ind==32
+            letter='6';
+        elseif ind==33
+            letter='7';
+        elseif ind==34
+            letter='8';
+        elseif ind==35
+            letter='9';
+        else
+            letter='0';
+        end
+        noPlate = [noPlate letter]
+    end
+    
+    noPlate
+
+end
