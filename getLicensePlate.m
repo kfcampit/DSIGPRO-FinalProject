@@ -34,22 +34,22 @@ function noPlate = getLicensePlate(im)
     alphanum = [letter number];
     
     %% Load Image    
-    figure(1);subplot(3,2,1);imshow(im);
-    title("Original RGB Image")
+    %figure(1);subplot(3,2,1);imshow(im);
+    %title("Original RGB Image")
     
     %% Extract Rectangular License Plate
     % Convert to Grayscale
     imgray = rgb2gray(im);
-    figure(1);subplot(3,2,2);imshow(imgray);
-    title("Grayscale Image")
+    %figure(1);subplot(3,2,2);imshow(imgray);
+    %title("Grayscale Image")
     
     % Apply Gaussian Blur
     imgauss = imgaussfilt(imgray,0.1);
     
     % Convert to Binary 
     imbin = imbinarize(imgauss, 0.5);
-    figure(1);subplot(3,2,3);imshow(imbin);
-    title("Binary Image")
+    %figure(1);subplot(3,2,3);imshow(imbin);
+    %title("Binary Image")
     
     Iprops=regionprops(imbin,'BoundingBox','Area', 'Image');
     maxa = Iprops.Area;
@@ -70,8 +70,8 @@ function noPlate = getLicensePlate(im)
     end   
     
     im = imcrop(imbin, boundingBox);
-    figure(1);subplot(3,2,4);imshow(im);
-    title("Extracted License Plate");
+    %figure(1);subplot(3,2,4);imshow(im);
+    %title("Extracted License Plate");
     
     %% Character Extraction
     % Remove parts of the image that has less than 64 pixels connected with
@@ -79,12 +79,12 @@ function noPlate = getLicensePlate(im)
     im = bwareaopen(~im, 64);
     [h, w] = size(im);
     
-    figure(1);subplot(3,2,5);imshow(im);
-    title("Inverted License Plate");
+    %figure(1);subplot(3,2,5);imshow(im);
+    %title("Inverted License Plate");
     
     im = imerode(im,strel("square",2));
-    figure(1);subplot(3,2,6);imshow(im);
-    title("Eroded License Plate");
+    %figure(1);subplot(3,2,6);imshow(im);
+    %title("Eroded License Plate");
     
     im = imresize(im, [200 540]);
     
@@ -104,12 +104,12 @@ function noPlate = getLicensePlate(im)
     
     noPlate=[];
     
-    figure(2);
+    %figure(2);
     for i=1:numel(iprops_boundingbox)
         let = imcrop(im, iprops_boundingbox(i).BoundingBox);
         let = imresize(let, [42 24]);
     
-        subplot(2,7,i);imshow(let);
+        %subplot(2,7,i);imshow(let);
         
         rec = [ ];
     
@@ -127,7 +127,7 @@ function noPlate = getLicensePlate(im)
             ind = find([zeros(1,26) rec] == max([zeros(1,26) rec]));
         end
     
-        subplot(2,7,7+i);imshow(alphanum{ind});
+        %subplot(2,7,7+i);imshow(alphanum{ind});
         
         if ind==1
             letter='A';

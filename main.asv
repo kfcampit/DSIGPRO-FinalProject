@@ -35,14 +35,21 @@ for i=1:numParkings
     fig=figure(2);
 
     if any(parked(:)==i)
-        lpvalue = getLicensePlate(cameraFeeds{i});
+        lpvalue = getLicensePlate(cameraFeeds(i));
         subplot(2,numParkings/2,i);imshow(cameraFeeds{i});
-        title(strcat(strcat(strcat('parking-lot-',int2str(i)),':'),lpvalue));
+        title(strcat('license-plate:',lpvalue));
     else
         subplot(2,numParkings/2,i);imshow(cameraFeeds{i});
-        title(strcat(strcat(strcat('parking-lot-',int2str(i)),':'),'available'));
+    title(strcat('license-plate:',int2str(i)));
     end
     
+end
+fig.Name = "All Parking Lots License Plate Camera";
+
+for i=parked
+    fig=figure(3);
+    subplot(1,numel(parked),i);imshow(cameraFeeds{i});
+    title(strcat('parking-lot-',int2str(i)));i
 end
 fig.Name = "All Parking Lots License Plate Camera";
 

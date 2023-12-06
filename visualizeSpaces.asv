@@ -2,7 +2,7 @@ function visualizeSpaces(rgbTestImage, props, centroids, percentageFilled, fontS
     freeLabel = "0";
     parkedLabel = "0";
 
-    hFig2 = figure;
+    hFig2 = figure(10);
     imshow(rgbTestImage);
     hFig2.WindowState = 'maximized';
     hFig2.Name = 'Available Parking with Counter';
@@ -16,21 +16,19 @@ function visualizeSpaces(rgbTestImage, props, centroids, percentageFilled, fontS
         if props(k).Area > 100
             if percentageFilled(k) > 0.40
                 parkedCount = parkedCount + 1;
-                parkedLabel = sprintf('%d',parkedCount);
-                %plot(x, y, 'rx', 'MarkerSize', 30, 'LineWidth', 4);
-                lpr = 
+                parkedLabel = sprintf('%d',k);
                 text(x, y + 20, parkedLabel, 'Color', 'r', 'FontSize', 15, 'FontWeight', 'bold');
                 rectangle('Position', props(k).BoundingBox, 'EdgeColor', 'r','LineWidth',1);
             else
                 freeCount = freeCount + 1;
-                freeLabel = sprintf('%d',freeCount);
-                %plot(x, y, 'g.', 'MarkerSize', 40, 'LineWidth', 4);
+                freeLabel = sprintf('%d',k);
+                text(x, y + 20, freeLabel, 'Color', 'g', 'FontSize', 15, 'FontWeight', 'bold');
                 rectangle('Position', props(k).BoundingBox, 'EdgeColor', 'g','LineWidth',1);
             end
         end
     end
-    text(25, 25, strcat("Available: ",freeLabel), 'Color', 'g', 'FontSize', 30, 'FontWeight', 'bold');
-    text(25, 60, strcat("Taken: ",parkedLabel), 'Color', 'r', 'FontSize', 30, 'FontWeight', 'bold');
+    text(25, 15, strcat("Available: ",sprintf('%d',parkedCount)), 'Color', 'g', 'FontSize', 24, 'FontWeight', 'bold');
+    text(25, 28, strcat("Taken: ",sprintf('%d',k)), 'Color', 'r', 'FontSize', 24, 'FontWeight', 'bold');
 
     title('Marked Spaces. Green Spot = Available. Red X = Taken.', 'FontSize', fontSize);
 end
